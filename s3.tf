@@ -1,6 +1,20 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Simple KMS key created for testing bucket encryption
+resource "aws_kms_key" "main" {
+  description             = "Test KMS Key for S3 Encryption"
+  deletion_window_in_days = 7
+}
+
 resource "aws_s3_bucket" "media" {
-  bucket = "${local.name_prefix}-media-store"
-  tags   = local.tags
+  # Bucket names must be globally unique; append random characters if needed
+  bucket = "test-media-store-12345678"
+
+  tags = {
+    Environment = "Test"
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "media_block" {
@@ -26,6 +40,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "media_enc" {
 
 resource "aws_s3_bucket_versioning" "media_ver" {
   bucket = aws_s3_bucket.media.id
+
   versioning_configuration {
     status = "Enabled"
   }
